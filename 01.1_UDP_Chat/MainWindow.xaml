@@ -1,0 +1,61 @@
+﻿<Window x:Class="_01._1_UDP_Chat.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:_01._1_UDP_Chat"
+        d:DataContext="{d:DesignInstance Type=local:ViewModel}" 
+
+        mc:Ignorable="d"
+        Title="MainWindow" MinHeight="550" Width="500">
+    <Window.DataContext>
+        <local:ViewModel/>
+    </Window.DataContext>
+    <DockPanel>
+        <Grid DockPanel.Dock="Top" Margin="5" Height="30">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="0.3*"></ColumnDefinition>
+                <ColumnDefinition Width="2*"></ColumnDefinition>
+                <ColumnDefinition Width="0.5*"></ColumnDefinition>
+                <ColumnDefinition Width="1*"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <TextBlock Padding="10, 0, 0, 0" Grid.Column="0" Text="IP: " VerticalAlignment="Center"/>
+            <Border Grid.Column="1" BorderBrush="Black" BorderThickness="2" VerticalAlignment="Center">
+                <TextBox Text="{Binding IPProp}"></TextBox>
+            </Border>
+            <TextBlock Padding="15, 0, 0, 0" Grid.Column="2" Text="Port: " VerticalAlignment="Center"/>
+            <Border Grid.Column="3" BorderBrush="Black" BorderThickness="2" VerticalAlignment="Center">
+                <TextBox Text="{Binding PortProp}"></TextBox>
+            </Border>
+        </Grid>
+        <Grid DockPanel.Dock="Top" Margin="5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="5*"></ColumnDefinition>
+                <ColumnDefinition Width="1*"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <Border Grid.Column="0" Margin="0, 10, 0, 0" BorderBrush="Black" BorderThickness="2">
+                <TextBox Text="{Binding MessageField}"></TextBox>
+            </Border>
+            <Button Grid.Column="1" Margin="10, 10, 0, 0" BorderThickness="2" BorderBrush="Black" Background="GreenYellow" Command="{Binding SendMessageCmd}">
+                Send
+            </Button>
+        </Grid>
+        <TextBlock DockPanel.Dock="Top" HorizontalAlignment="Center">Dialog:</TextBlock>
+        <ScrollViewer DockPanel.Dock="Top" HorizontalAlignment="Stretch" Height="400">
+            <Border DockPanel.Dock="Top" BorderThickness="2" BorderBrush="Black">
+                <ListBox Background="LightBlue" ItemsSource="{Binding Messages}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <DockPanel>
+                                <Label DockPanel.Dock="Left" FontWeight="Bold" Content="{Binding GetToString}" BorderThickness="0, 0, 0, 2" BorderBrush="Black"></Label>
+                            </DockPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Border>
+        </ScrollViewer>
+        <Border DockPanel.Dock="Bottom">
+            <Button Width="100" Height="20" Command="{Binding SaveMessagesCmd}">Save messages</Button>
+        </Border>
+    </DockPanel>
+</Window>
