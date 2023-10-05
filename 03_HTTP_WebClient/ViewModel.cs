@@ -40,10 +40,6 @@ namespace _03_HTTP_WebClient
 
             client.DownloadProgressChanged += Client_DownloadProgressChanged;
             client.DownloadFileCompleted += Client_DownloadFileCompleted;
-
-            operations = new ObservableCollection<ImageInfo>();
-            // даємо можливість "біндиться" до параметрів операції копіювання
-            //operationsList.ItemsSource = operations;
         }
 
         #region Command Download image
