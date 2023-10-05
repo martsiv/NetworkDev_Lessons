@@ -1,0 +1,61 @@
+﻿<Window x:Class="_03_HTTP_WebClient.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:_03_HTTP_WebClient"
+        mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance Type=local:ViewModel}" 
+
+        Title="MainWindow" Height="600" Width="800" MinHeight="300" MinWidth="400">
+    <Window.DataContext>
+        <local:ViewModel/>
+    </Window.DataContext>
+    <DockPanel>
+        <StackPanel  DockPanel.Dock="Top">
+            <UniformGrid Margin="10, 10, 10, 0" Rows="1">
+                <DockPanel Margin="5, 0">
+                    <TextBlock Text="Categoty: "/>
+                    <TextBox x:Name="categoryTextBox" HorizontalAlignment="Stretch" Text="{Binding Category}"></TextBox>
+                </DockPanel>
+                <DockPanel Margin="5, 0">
+                    <TextBlock Text="Width: "/>
+                    <TextBox Name="widthTextBox" Text="{Binding Width}"/>
+                </DockPanel>
+                <DockPanel Margin="5, 0">
+                    <TextBlock Text="Heigth: "/>
+                    <TextBox x:Name="heightTextBox" Text="{Binding Height}"/>
+                </DockPanel>
+            </UniformGrid>
+            <DockPanel Grid.Row="1">
+                <Label VerticalAlignment="Center">To folder:</Label>
+                <Button DockPanel.Dock="Right" x:Name="OpenFolderButton" Margin="5" Padding="20,0" Command="{Binding ChooseFolderCmd}">Choose Folder</Button>
+                <TextBox x:Name="folderTarget" Text="{Binding TargetDirectory}" Margin="5"></TextBox>
+            </DockPanel>
+            <ProgressBar x:Name="progressBar" Height="20" Margin="10" Value="{Binding Progress}"></ProgressBar>
+            <Button Height="40" Margin="10" Background="LightGreen" Command="{Binding DownloadImageCmd}">Download</Button>
+            <Button Height="40" Margin="10" Background="Red" x:Name="StopButton" Command="{Binding StopCmd}">Stop</Button>
+        </StackPanel>
+        <Border BorderThickness="2" Margin="2" BorderBrush="Black" >
+            <ListBox Name="operationsList" Grid.Row="5" HorizontalContentAlignment="Stretch" ItemsSource="{Binding Operations}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <DockPanel>
+                            <Label>Image</Label>
+                            <Label FontWeight="Bold" Content="{Binding  Destination}"></Label>
+                            <Label>with params:</Label>
+                            <Label>Category:</Label>
+                            <Label FontWeight="Bold" Content="{Binding  Category}"></Label>
+                            <Label>Width:</Label>
+                            <Label FontWeight="Bold" Content="{Binding  Width}"></Label>
+                            <Label>Height:</Label>
+                            <Label FontWeight="Bold" Content="{Binding  Height}"></Label>
+                            <Label>at</Label>
+                            <Label FontWeight="Bold" Content="{Binding OperationDateString}"></Label>
+                        </DockPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Border>
+    </DockPanel>
+</Window>
