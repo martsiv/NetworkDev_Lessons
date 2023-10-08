@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace _02._2_SMTP_Client_Simple
+namespace _04._1_IMAP_Client
 {
     /// <summary>
     /// Interaction logic for App.xaml
