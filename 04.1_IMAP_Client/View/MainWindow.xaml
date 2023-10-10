@@ -5,7 +5,6 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:_04._1_IMAP_Client.View"
         xmlns:vm="clr-namespace:_04._1_IMAP_Client.ViewModel"
-        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         d:DataContext="{d:DesignInstance Type=vm:ViewModelMainWindow}"
         mc:Ignorable="d"
         Title="MainWindow" Height="250" Width="400">

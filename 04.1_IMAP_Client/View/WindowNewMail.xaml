@@ -7,11 +7,56 @@
         xmlns:vm="clr-namespace:_04._1_IMAP_Client.ViewModel"
         d:DataContext="{d:DesignInstance Type=vm:ViewModelNewMail}" 
         mc:Ignorable="d"
-        Title="WindowNewMail" Height="450" Width="800">
-    <Window.DataContext>
-        <vm:ViewModelNewMail/>
-    </Window.DataContext>
-    <Grid>
-        
-    </Grid>
+        Title="WindowNewMail" Height="550" Width="800">
+    <DockPanel>
+        <Grid DockPanel.Dock="Top">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="80"/>
+            </Grid.RowDefinitions>
+
+            <Label VerticalContentAlignment="Center" Grid.Column="0" Grid.Row="0">To:</Label>
+            <TextBox Name="toTxtBox" Margin="5" VerticalContentAlignment="Center" Grid.Column="1" Grid.Row="0" Text="{Binding To}"></TextBox>
+
+            <Label VerticalContentAlignment="Center" Grid.Column="0" Grid.Row="1">Subject:</Label>
+            <TextBox Name="subjectTxtBox" Margin="5" VerticalContentAlignment="Center" Grid.Column="1" Grid.Row="1" Text="{Binding Subject}"></TextBox>
+
+            <Label VerticalContentAlignment="Center" Grid.Column="0" Grid.Row="2">Your display name:</Label>
+            <TextBox  Margin="5" VerticalContentAlignment="Center" Grid.Column="1" Grid.Row="2" Text="{Binding YourNameToShow}"></TextBox>
+
+            <Label VerticalContentAlignment="Center" Grid.Column="0" Grid.Row="3">Priority:</Label>
+            <ComboBox  Grid.Column="1" Grid.Row="3" ItemsSource="{Binding Priority}" 
+                       SelectedIndex="{Binding SelectedPriority, Mode=TwoWay}">
+            </ComboBox>
+
+            <Label VerticalContentAlignment="Center" Grid.Column="0" Grid.Row="4">Attachments:</Label>
+            <Button Width="auto" Grid.Row="4" Grid.ColumnSpan="2" Height="40" Margin="116,0,0,0" VerticalAlignment="Bottom" Command="{Binding AddAttachmentCmd}">Add Attachment</Button>
+
+
+            <Label VerticalContentAlignment="Center" Grid.Column="0" Grid.Row="5">Added attachments:</Label>
+            <Border Grid.Column="1" Grid.Row="5" BorderThickness="2" Margin="2" BorderBrush="Black" >
+                <ListBox Name="operationsList" Grid.Row="5" HorizontalContentAlignment="Stretch" ItemsSource="{Binding Attachments}">
+                    <!--<ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <DockPanel>
+                                <Label>Image</Label>
+                                <Label FontWeight="Bold" Content="{Binding  Destination}"></Label>
+                                 </DockPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>-->
+                </ListBox>
+            </Border>
+        </Grid>
+        <TextBlock DockPanel.Dock="Top" TextAlignment="Center" FontWeight="Bold" FontSize="32">Text</TextBlock>
+        <Button  DockPanel.Dock="Bottom" Padding="8" FontSize="20" FontWeight="Bold" Command="{Binding SendMailCmd}">Send</Button>
+        <TextBox Name="bodyTxtBox" Margin="5" TextWrapping="Wrap" AcceptsReturn="True" Text="{Binding Text}"></TextBox>
+    </DockPanel>
 </Window>

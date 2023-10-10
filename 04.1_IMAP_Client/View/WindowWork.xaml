@@ -4,10 +4,15 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:_04._1_IMAP_Client.View"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:vm="clr-namespace:_04._1_IMAP_Client.ViewModel"
         d:DataContext="{d:DesignInstance Type=vm:ViewModelWork}"
         mc:Ignorable="d"
         Title="WindowWork" Height="450" Width="800">
+    <Window.Resources>
+        <vm:MessageContentConverter x:Key="MessageContentConverter" />
+    </Window.Resources>
+
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="0.6*"/>
@@ -26,31 +31,71 @@
         HorizontalAlignment="Center" VerticalAlignment="Stretch" />
         <Border Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="5" BorderThickness="3" BorderBrush="Black">
             <StackPanel Orientation="Horizontal">
-                <Button Margin="2" Command="{Binding RefreshCmd}">Refresh</Button>
-                <Button Margin="2">New message</Button>
+                <Button Margin="2" Command="{Binding OpenWindowNewMailCmd}">New message</Button>
+                <Button Margin="2" Command="{Binding ReplyMessageCmd}">Reply message</Button>
+                <Button Margin="2" Command="{Binding DeleteMessageCmd}">Delete message</Button>
+
             </StackPanel>
         </Border>
         <StackPanel Grid.Column="0" Grid.Row="1">
             <Border BorderThickness="1, 1, 1, 1" Margin="1" BorderBrush="Black">
                 <TextBlock Text="Folders" HorizontalAlignment="Center"/>
             </Border>
-            <ListBox ItemsSource="{Binding MailFolders}">
+            <ListBox ItemsSource="{Binding MailFolders}" SelectedItem="{Binding SelectedFolder}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <TextBlock Text="{Binding Name}"></TextBlock>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName = "MouseDoubleClick">
+                        <i:InvokeCommandAction Command = "{Binding ShowMailsInFolderCmd}"/>
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
             </ListBox>
         </StackPanel>
         <StackPanel Grid.Column="2" Grid.Row="1">
             <Border BorderThickness="1, 1, 1, 1" Margin="1" BorderBrush="Black">
                 <TextBlock Text="Mails" HorizontalAlignment="Center"/>
             </Border>
+            <ListBox ItemsSource="{Binding EmailList}" DisplayMemberPath="Subject" SelectedItem="{Binding SelectedEmail}">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName = "MouseDoubleClick">
+                        <i:InvokeCommandAction Command = "{Binding ShowMailCmd}"/>
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </ListBox>
         </StackPanel>
         <StackPanel Grid.Column="4" Grid.Row="1">
             <Border BorderThickness="1, 1, 1, 1" Margin="1" BorderBrush="Black">
                 <TextBlock Text="Content" HorizontalAlignment="Center"/>
             </Border>
+            <StackPanel>
+                <TextBlock FontSize="30" Text="{Binding FullMessage.Subject}"/>
+                <DockPanel>
+                    <StackPanel DockPanel.Dock="Left">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="From: "/>
+                            <TextBlock Text="{Binding FullMessage.From}"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="To: "/>
+                            <TextBlock Text="{Binding FullMessage.To}"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Date: "/>
+                            <TextBlock Text="{Binding FullMessage.Date}"/>
+                        </StackPanel>
+                    </StackPanel>
+                    <StackPanel DockPanel.Dock="Right">
+                        <TextBlock Text="Attachments: "></TextBlock>
+                        <ListBox ItemsSource="{Binding Attachments}"/>
+                    </StackPanel>
+                </DockPanel>
+                <ScrollViewer HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible">
+                    <TextBlock Text="{Binding FullMessage, Converter={StaticResource MessageContentConverter}}"/>
+                </ScrollViewer>
+            </StackPanel>
         </StackPanel>
     </Grid>
 </Window>

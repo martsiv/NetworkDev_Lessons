@@ -21,6 +21,7 @@ namespace MailServiceNamespace
         private int SMTP_Port { get; init; }
         private string IMAP_Host { get; init; }
         private int IMAP_Port { get; init; }
+        public string NameFrom { get; set; }
         public string Login { get; set; }
         public string Password { get; set; }
         private SmtpClient smtpClient;
@@ -55,7 +56,7 @@ namespace MailServiceNamespace
             }
             try
             {
-                await imapClient.ConnectAsync (IMAP_Host, IMAP_Port);
+                await imapClient.ConnectAsync(IMAP_Host, IMAP_Port);
                 await imapClient.AuthenticateAsync(Login, Password);
                 await imapClient.DisconnectAsync(true);
             }
@@ -76,30 +77,51 @@ namespace MailServiceNamespace
             await imapClient.ConnectAsync(IMAP_Host, IMAP_Port);
             await imapClient.AuthenticateAsync(Login, Password);
             var folders = new List<IMailFolder>();
-            //var personal = imapClient.GetFolderAsync(imapClient.PersonalNamespaces[0]);
-
-            //await personal.OpenAsync(FolderAccess.ReadOnly);
-            //var subfolders = personal.GetSubfolders();
-
-            //foreach (var folder in subfolders)
-            //{
-            //    folders.Add(folder);
-            //}
             folders = imapClient.GetFolders(imapClient.PersonalNamespaces[0]).ToList();
+
             await imapClient.DisconnectAsync(true);
             return folders;
         }
-        public async Task<IList<UniqueId>> GetAllSendMessagesAsync()
+        public async Task<List<EmailListData>> GetMessagesAsync(SpecialFolder specialFolder)
         {
             await imapClient.ConnectAsync(IMAP_Host, IMAP_Port);
             await imapClient.AuthenticateAsync(Login, Password);
-            var folder = imapClient.GetFolder(SpecialFolder.Sent);
-            folder.Open(FolderAccess.ReadWrite);
-            IList<UniqueId> uids = folder.Search(SearchQuery.All);
+            var folder = imapClient.GetFolder(specialFolder);
+            await folder.OpenAsync(FolderAccess.ReadWrite);
+            List<EmailListData> emailListDatas = new List<EmailListData>();
+            foreach (var email in folder)
+                emailListDatas.Add(new EmailListData() { Id = email.MessageId, Subject = email.Subject });
             await imapClient.DisconnectAsync(true);
-            return uids;
+            return emailListDatas;
         }
-        public async Task<IList<UniqueId>> GetAllInbaxMessagesAsync()
+        public async Task<MimeMessage?> GetMessageAsync(SpecialFolder specialFolder, string Id)
+        {
+            await imapClient.ConnectAsync(IMAP_Host, IMAP_Port);
+            await imapClient.AuthenticateAsync(Login, Password);
+            var folder = imapClient.GetFolder(specialFolder);
+            await folder.OpenAsync(FolderAccess.ReadWrite);
+            var message = folder.FirstOrDefault(m => m.MessageId == Id);
+            await imapClient.DisconnectAsync(true);
+            return message;
+        }
+        public async Task DeleteMessageAsync(SpecialFolder specialFolder, string Id)
+        {
+            await imapClient.ConnectAsync(IMAP_Host, IMAP_Port);
+            await imapClient.AuthenticateAsync(Login, Password);
+            var folder = imapClient.GetFolder(specialFolder);
+            await folder.OpenAsync(FolderAccess.ReadWrite);
+            UniqueId messageId = folder.Search(SearchQuery.HeaderContains("Message-ID", Id)).FirstOrDefault();
+            if (messageId != null)
+            {
+                //folder.Open(FolderAccess.ReadWrite);
+                //folder.AddFlags(messageId, MessageFlags.Deleted, true); // Встановіть прапорець Deleted, вказавши true для видалення
+                //folder.Expunge(); // Видаліть видалені повідомлення
+                folder.MoveTo(messageId, imapClient.GetFolder(SpecialFolder.Trash)); 
+            }
+
+            await imapClient.DisconnectAsync(true);
+        }
+        public async Task<IList<UniqueId>> GetAllInboxMessagesAsync()
         {
             await imapClient.ConnectAsync(IMAP_Host, IMAP_Port);
             await imapClient.AuthenticateAsync(Login, Password);
@@ -108,5 +130,36 @@ namespace MailServiceNamespace
             await imapClient.DisconnectAsync(true);
             return uids;
         }
+        public async Task<string> SendNewMailAsync(string subjectMail, string textBody, string htmlBody, string emailTo, int priority, List<string>? attachments = null, string? nameTo = null)
+        {
+            var message = new MimeMessage();
+            message.From.Add(new MailboxAddress(NameFrom, Login));
+            message.To.Add(new MailboxAddress(nameTo == null ? "" : nameTo, emailTo));
+            message.Subject = subjectMail;
+            message.Importance = (MessageImportance)priority;
+            var bodyBuilder = new BodyBuilder();
+            if (!string.IsNullOrEmpty(textBody))
+                bodyBuilder.TextBody = textBody;
+            if (!string.IsNullOrEmpty(htmlBody))
+                bodyBuilder.HtmlBody = htmlBody;
+
+            // Adding atachments
+            if (attachments != null && 0 < attachments.Count)
+                foreach (var attachment in attachments)
+                    bodyBuilder.Attachments.Add(attachment); // Path to each attachment
+
+            message.Body = bodyBuilder.ToMessageBody();
+
+            await smtpClient.ConnectAsync(SMTP_Host, SMTP_Port);
+            await smtpClient.AuthenticateAsync(Login, Password);
+            string answer = await smtpClient.SendAsync(message);
+            await smtpClient.DisconnectAsync(true);
+            return answer;
+        }
+    }
+    public class EmailListData
+    {
+        public string Id { get; set; }
+        public string Subject { get; set; }
     }
 }
